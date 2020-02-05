@@ -1,4 +1,6 @@
+import boto3
 import json
+import os
 
 # import requests
 
@@ -32,6 +34,23 @@ def lambda_handler(event, context):
     #     print(e)
 
     #     raise e
+
+    BUCKET_NAME_FRONT = os.environ['BUCKET_NAME_FRONT']
+
+    session = boto3.session.Session()
+    region_name = session.region_name
+
+    bucket_name = BUCKET_NAME_FRONT + '-' + region_name
+    print('bucket_name', bucket_name)
+
+    s3 = session.resource('s3')
+    bucket = s3.Bucket(bucket_name)
+
+    object_count = len([True for _ in bucket.objects.all()])
+    print('object_count', object_count)
+
+    for object in bucket.objects.all():
+        print('\t', object.key)
 
     return {
         "statusCode": 200,
